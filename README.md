@@ -1,4 +1,4 @@
-# my-spring
+
 
 
 ## 스프링 프로젝트를 실행시키면 내부에서 어떤 일이 발생할까?
@@ -823,12 +823,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
-        // Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
-        // (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
-        if (!NativeDetector.inNativeImage() && beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
-            beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
-            beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
-        }
+        // ... 생략
     }
 }
 ```
@@ -837,11 +832,50 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 - 대표적으로 싱글톤 객체로 인스턴스화할 빈을 탐색하는 작업을 진행된다.
 - 스프링은 인스턴스화를 진행할 빈의 목록(BeanDefinition)을 로딩하는 작업과 실제 인스턴스화를 하는 작업을 나눠서 처리하는데, 인스턴스로 만들 빈의 목록을 찾는 단계가 여기에 속한다.
 - 빈 목록은 @Configuration 클래스를 파싱해서 가져오는데, BeanFactoryPostProcessor의 구현체 중 하나인 ConfigurationClassPostProcessor가 진행한다.
+
+```java
+final class PostProcessorRegistrationDelegate {
+    // ... 생략
+    public static void invokeBeanFactoryPostProcessors(
+            ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
+        
+        Set<String> processedBeans = new HashSet<>();
+
+        if (beanFactory instanceof BeanDefinitionRegistry registry) {
+            List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+            List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
+
+            for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
+                if (postProcessor instanceof BeanDefinitionRegistryPostProcessor registryProcessor) {
+
+                    // ... 생략
+                    registryProcessor.postProcessBeanDefinitionRegistry(registry);
+                    registryProcessors.add(registryProcessor);
+                }
+                else {
+                    // ... 생략
+                }
+            }
+            // ... 생략
+        } else {
+            // ... 생략
+        }
+        // ... 생략
+    }
+
+}
+```
 ```java
 public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
 		BeanRegistrationAotProcessor, BeanFactoryInitializationAotProcessor, PriorityOrdered,
 		ResourceLoaderAware, ApplicationStartupAware, BeanClassLoaderAware, EnvironmentAware {
 
+    @Override
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+        // ... 생략
+        processConfigBeanDefinitions(registry);
+    }
+    
     public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
         List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
         String[] candidateNames = registry.getBeanDefinitionNames();
@@ -1096,7 +1130,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         // Allow for caching all bean definition metadata, not expecting further changes.
         beanFactory.freezeConfiguration();
 
-        // Instantiate all remaining (non-lazy-init) singletons.
+        // 객체를 생성하는 부분
         beanFactory.preInstantiateSingletons();
     }
 }
@@ -1269,83 +1303,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         // Instantiate the bean.
         BeanWrapper instanceWrapper = null;
-        if (mbd.isSingleton()) {
-            instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
-        }
+        
+        // ... 생략
         if (instanceWrapper == null) {
             instanceWrapper = createBeanInstance(beanName, mbd, args);
         }
-        Object bean = instanceWrapper.getWrappedInstance();
-        Class<?> beanType = instanceWrapper.getWrappedClass();
-        if (beanType != NullBean.class) {
-            mbd.resolvedTargetType = beanType;
-        }
 
-        // Allow post-processors to modify the merged bean definition.
-        synchronized (mbd.postProcessingLock) {
-            if (!mbd.postProcessed) {
-                try {
-                    applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
-                }
-                catch (Throwable ex) {
-                    throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-                            "Post-processing of merged bean definition failed", ex);
-                }
-                mbd.markAsPostProcessed();
-            }
-        }
-
-        // Eagerly cache singletons to be able to resolve circular references
-        // even when triggered by lifecycle interfaces like BeanFactoryAware.
-        boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-                isSingletonCurrentlyInCreation(beanName));
-        if (earlySingletonExposure) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Eagerly caching bean '" + beanName +
-                        "' to allow for resolving potential circular references");
-            }
-            addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
-        }
-
-        // Initialize the bean instance.
-        Object exposedObject = bean;
+        // ... 생략
         try {
+            // ... 생략
             populateBean(beanName, mbd, instanceWrapper);
-            exposedObject = initializeBean(beanName, exposedObject, mbd);
+            
         } catch (Throwable ex) {
-            if (ex instanceof BeanCreationException bce && beanName.equals(bce.getBeanName())) {
-                throw bce;
-            } else {
-                throw new BeanCreationException(mbd.getResourceDescription(), beanName, ex.getMessage(), ex);
-            }
+            // ... 생략
         }
 
-        if (earlySingletonExposure) {
-            Object earlySingletonReference = getSingleton(beanName, false);
-            if (earlySingletonReference != null) {
-                if (exposedObject == bean) {
-                    exposedObject = earlySingletonReference;
-                } else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
-                    String[] dependentBeans = getDependentBeans(beanName);
-                    Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
-                    for (String dependentBean : dependentBeans) {
-                        if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
-                            actualDependentBeans.add(dependentBean);
-                        }
-                    }
-                    if (!actualDependentBeans.isEmpty()) {
-                        throw new BeanCurrentlyInCreationException(beanName,
-                                "Bean with name '" + beanName + "' has been injected into other beans [" +
-                                        StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +
-                                        "] in its raw version as part of a circular reference, but has eventually been " +
-                                        "wrapped. This means that said other beans do not use the final version of the " +
-                                        "bean. This is often the result of over-eager type matching - consider using " +
-                                        "'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.");
-                    }
-                }
-            }
-        }
-
+        
         // Register bean as disposable.
         try {
             registerDisposableBeanIfNecessary(beanName, bean, mbd);
@@ -1356,10 +1329,230 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         return exposedObject;
     }
-    
+
+    protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
+        if (bw == null) {
+            if (mbd.hasPropertyValues()) {
+                throw new BeanCreationException(
+                        mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
+            }
+            else {
+                // Skip property population phase for null instance.
+                return;
+            }
+        }
+
+        if (bw.getWrappedClass().isRecord()) {
+            if (mbd.hasPropertyValues()) {
+                throw new BeanCreationException(
+                        mbd.getResourceDescription(), beanName, "Cannot apply property values to a record");
+            }
+            else {
+                // Skip property population phase for records since they are immutable.
+                return;
+            }
+        }
+
+        // Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
+        // state of the bean before properties are set. This can be used, for example,
+        // to support styles of field injection.
+        if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+            for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+                if (!bp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {
+                    return;
+                }
+            }
+        }
+
+        PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
+
+        // 1) 
+        int resolvedAutowireMode = mbd.getResolvedAutowireMode();
+        if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+            MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
+            // Add property values based on autowire by name if applicable.
+            if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
+                autowireByName(beanName, mbd, bw, newPvs);
+            }
+            // Add property values based on autowire by type if applicable.
+            if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+                autowireByType(beanName, mbd, bw, newPvs);
+            }
+            pvs = newPvs;
+        }
+        
+        // 2) ㅇㅇ
+        if (hasInstantiationAwareBeanPostProcessors()) {
+            if (pvs == null) {
+                pvs = mbd.getPropertyValues();
+            }
+            for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+                
+                // 실제 의존선 주입 발생
+                PropertyValues pvsToUse = bp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
+                
+                if (pvsToUse == null) {
+                    return;
+                }
+                pvs = pvsToUse;
+            }
+        }
+        // ... 생략
+    }
+
+    protected void autowireByName(
+            String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
+
+        String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
+        for (String propertyName : propertyNames) {
+            if (containsBean(propertyName)) {
+                Object bean = getBean(propertyName);
+                pvs.add(propertyName, bean);
+                registerDependentBean(propertyName, beanName);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Added autowiring by name from bean name '" + beanName +
+                            "' via property '" + propertyName + "' to bean named '" + propertyName + "'");
+                }
+            }
+            else {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Not autowiring property '" + propertyName + "' of bean '" + beanName +
+                            "' by name: no matching bean found");
+                }
+            }
+        }
+    }
+
+    protected void autowireByType(
+            String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
+
+        TypeConverter converter = getCustomTypeConverter();
+        if (converter == null) {
+            converter = bw;
+        }
+
+        Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
+        String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
+        for (String propertyName : propertyNames) {
+            try {
+                PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
+                // Don't try autowiring by type for type Object: never makes sense,
+                // even if it technically is an unsatisfied, non-simple property.
+                if (Object.class != pd.getPropertyType()) {
+                    MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
+                    // Do not allow eager init for type matching in case of a prioritized post-processor.
+                    boolean eager = !(bw.getWrappedInstance() instanceof PriorityOrdered);
+                    DependencyDescriptor desc = new AutowireByTypeDependencyDescriptor(methodParam, eager);
+                    Object autowiredArgument = resolveDependency(desc, beanName, autowiredBeanNames, converter);
+                    if (autowiredArgument != null) {
+                        pvs.add(propertyName, autowiredArgument);
+                    }
+                    for (String autowiredBeanName : autowiredBeanNames) {
+                        registerDependentBean(autowiredBeanName, beanName);
+                        
+                        
+                        
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Autowiring by type from bean name '" + beanName + "' via property '" +
+                                    propertyName + "' to bean named '" + autowiredBeanName + "'");
+                        }
+                    }
+                    autowiredBeanNames.clear();
+                }
+            }
+            catch (BeansException ex) {
+                throw new UnsatisfiedDependencyException(mbd.getResourceDescription(), beanName, propertyName, ex);
+            }
+        }
+    }
+
+}
+```
+
+```java
+public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationAwareBeanPostProcessor,
+        MergedBeanDefinitionPostProcessor, BeanRegistrationAotProcessor, PriorityOrdered, BeanFactoryAware {
+    @Override
+    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+        InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
+        try {
+            metadata.inject(bean, beanName, pvs);
+        }
+        catch (BeanCreationException ex) {
+            throw ex;
+        }
+        catch (Throwable ex) {
+            throw new BeanCreationException(beanName, "Injection of autowired dependencies failed", ex);
+        }
+        return pvs;
+    }
+}
+```
+
+```java
+public class InjectionMetadata {
+    public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+        Collection<InjectedElement> checkedElements = this.checkedElements;
+        Collection<InjectedElement> elementsToIterate =
+                (checkedElements != null ? checkedElements : this.injectedElements);
+        if (!elementsToIterate.isEmpty()) {
+            for (InjectedElement element : elementsToIterate) {
+                // inject 발생
+                element.inject(target, beanName, pvs);
+            }
+        }
+    }
+
+    protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
+            throws Throwable {
+
+        if (this.isField) {
+            Field field = (Field) this.member;
+            ReflectionUtils.makeAccessible(field);
+            field.set(target, getResourceToInject(target, requestingBeanName));
+        }
+        else {
+            if (checkPropertySkipping(pvs)) {
+                return;
+            }
+            try {
+                Method method = (Method) this.member;
+                ReflectionUtils.makeAccessible(method);
+                method.invoke(target, getResourceToInject(target, requestingBeanName));
+            }
+            catch (InvocationTargetException ex) {
+                throw ex.getTargetException();
+            }
+        }
+    }
+}
+```
+
+
+
+```java
+public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
+    public void registerDependentBean(String beanName, String dependentBeanName) {
+        String canonicalName = canonicalName(beanName);
+
+        synchronized (this.dependentBeanMap) {
+            Set<String> dependentBeans = this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
+            if (!dependentBeans.add(dependentBeanName)) {
+                return;
+            }
+        }
+
+        synchronized (this.dependenciesForBeanMap) {
+            Set<String> dependenciesForBean = this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
+            dependenciesForBean.add(canonicalName);
+        }
+    }
 }
 
+
 ```
+
+
 ### 9-10. refresh 마무리 단계
 ```java
 public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext {
