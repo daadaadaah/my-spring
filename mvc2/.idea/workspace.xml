@@ -1,14 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
-      </MavenGeneralSettings>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="302de8f0-aa28-43a5-aefb-d1cc60938dd6" name="Changes" comment="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/login/src/main/java/hello/login/TestDataInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/login/src/main/java/hello/login/TestDataInit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/login/src/main/java/hello/login/web/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/login/src/main/java/hello/login/web/HomeController.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$/login">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
     </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "last_opened_file_path": "/Users/daheekwak/Desktop/my-spring/mvc2"
+  }
+}]]></component>
+  <component name="RebelAgentSelection">
+    <selection>jr</selection>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="ItemServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="hello.login.ItemServiceApplication" />
+      <module name="login.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="hello.login.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ItemServiceApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task id="LOCAL-00001" summary="gradle 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################">
+      <created>1682917215296</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1682917215296</updated>
+    </task>
+    <task id="LOCAL-00002" summary="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################">
+      <created>1682917328076</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1682917328077</updated>
+    </task>
+    <task id="LOCAL-00003" summary="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################">
+      <created>1682917419475</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1682917419475</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="gradle 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################" />
+    <MESSAGE value="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################" />
+    <option name="LAST_COMMIT_MESSAGE" value="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################" />
   </component>
 </project>
