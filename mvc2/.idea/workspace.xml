@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="302de8f0-aa28-43a5-aefb-d1cc60938dd6" name="Changes" comment="gradle 6 -&gt; 7 버전 수정&#10;&#10;&#10;####################################################&#10;# &lt;타입&gt;: &lt;제목(명령문으로, 최대 50글자까지만)&gt; &#10;&#10;# &lt;본문&gt;&#10;# - 제목과 본문을 1줄 띄워 분리하기&#10;# - 본문은 1줄에 최대 72글자 내로 제한&#10;# - 본문을 여러줄로 작성할 때 &quot;-&quot;로 구분&#10;&#10;&#10;# --- COMMIT END ---&#10;# &lt;타입&gt; 리스트&#10;#   feat    : 기능 (새로운 기능)&#10;#   fix     : 버그 (버그 수정)&#10;#   refactor: 리팩토링&#10;#   style   : 스타일 (코드 형식 또는 포맷)&#10;#   docs    : 문서 (문서 추가, 수정, 삭제)&#10;#   test    : 테스트&#10;#   chore   : 기타 변경사항 (빌드 스크립트 수정 등)&#10;# ------------------&#10;####################################################">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/login/src/main/java/hello/login/web/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/login/src/main/java/hello/login/web/HomeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/login/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/login/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
