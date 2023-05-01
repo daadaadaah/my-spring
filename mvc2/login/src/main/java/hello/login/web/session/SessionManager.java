@@ -1,5 +1,7 @@
 package hello.login.web.session;
 
+import org.springframework.stereotype.Component;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * SessionManager는 세션을 관리해준다
  */
+@Component
 public class SessionManager {
 
     public static final String SESSION_COOKE_NAME = "mySessionId";
