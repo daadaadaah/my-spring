@@ -49,6 +49,7 @@ public class LoginController {
         HttpSession session = request.getSession();
         // 2. 세션에 로그인 회원 정보를 보관한다.
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        session.setMaxInactiveInterval(60);
 
         return "redirect:/";
     }
