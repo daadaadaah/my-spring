@@ -3,6 +3,7 @@ package com.example.stock.service;
 import com.example.stock.domain.Stock;
 import com.example.stock.repository.StockRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -15,7 +16,8 @@ public class StockService {
     }
 
 
-//    @Transactional
+    // 부모의 트랜잭션과 별도로 수행되어야 하므로, propagation 변경해줘야 함.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public synchronized void decrease(Long id, Long quantity) {
         // get stock
 
