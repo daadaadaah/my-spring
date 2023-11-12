@@ -13,11 +13,9 @@
 public class AService {
 
   public void publicExternal() {
-      log.info("call external");
+      log.info("call public External");
 
       publicTXInternal();
-
-      privateTXInternal();
   }
 
   @Transactional
@@ -27,7 +25,7 @@ public class AService {
 
   @Transactional
   private void privateTXInternal() {
-      log.info("call private tx internal");
+      log.info("call private tx internal"); 
   }
 }
 ```
@@ -40,13 +38,18 @@ public class AServiceTest {
   AService aService;
 
   @Test
-  public void internalCall() {
-      aService.publicTXInternal(); // internal 트랜잭션 적용 됨
+  public void publicExternalCall() {
+      aService.publicExternal(); // @Trasactional이 적용된 public 메서드를 내부에서 호출하면, internal 트랜잭션 적용 안됨
   }
 
   @Test
-  public void externalCall() {
-      aService.publicExternal(); // internal 트랜잭션 적용 안됨
+  public void internalCall() {
+      aService.publicTXInternal(); // @Trasactional이 적용된 public 메서드를 직접 호출하면, internal 트랜잭션 적용 됨
+  }
+
+  @Test
+  public void privateTXInternalCall() {
+      aService.privateTXInternal(); // @Trasactional이 적용된 private 메서드를 직접 호출해도, 트랜잭션 적용 안됨
   }
 }
 ```
