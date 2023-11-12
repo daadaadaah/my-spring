@@ -7,6 +7,11 @@
 
 ## 트랜잭션  전파
 
+## @Transactional 동작원리 
+- https://sasca37.tistory.com/267
+- https://jiwondev.tistory.com/154
+
+
 ## 트랜잭션 주의사항
 ### 왜 내부 호출시 프록시 적용이 안되는 걸까?
 ```java
