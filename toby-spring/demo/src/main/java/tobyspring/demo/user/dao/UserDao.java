@@ -1,13 +1,10 @@
 package tobyspring.demo.user.dao;
 
-import javax.sql.DataSource;
 import java.sql.*;
 
-import org.springframework.boot.SpringApplication;
-import tobyspring.demo.DemoApplication;
 import tobyspring.demo.user.domain.User;
 
-public class UserDao {
+public abstract class UserDao {
 
     public void add(User user) throws ClassNotFoundException, SQLException {
         // 관심 1 : DB와 연결을 위한 커넥션을 어떻게 가져올까라는 관심
@@ -51,30 +48,5 @@ public class UserDao {
         return user;
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        User user = new User();
-        user.setId("daadaadaah");
-        user.setName("");
-        user.setPassword("secret1!");
-
-        UserDao userDao = new UserDao();
-        userDao.add(user);
-
-        System.out.println(user.getId() + " 등록 성공");
-
-        User user2 = userDao.get(user.getId());
-        System.out.println(user2.getName());
-        System.out.println(user2.getPassword());
-        System.out.println(user2.getId() + " 조회 성공");
-
-        SpringApplication.run(DemoApplication.class, args);
-    }
-
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("org.h2.Driver");
-
-        Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/toby-spring", "sa", "");
-
-        return c;
-    }
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 }
