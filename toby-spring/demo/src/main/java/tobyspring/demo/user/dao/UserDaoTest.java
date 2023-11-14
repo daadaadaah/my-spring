@@ -12,13 +12,9 @@ public class UserDaoTest {
         user.setName("");
         user.setPassword("test1!");
 
-        // 관계 설정 코드가 클라이언트 class(UserDaoTest) 에서 하도록 변경되었다.
-        // 이제야 서로가 완전히 분리되었다.
-//        ConnectionMaker connectionMaker = new NConnectionMaker(); // N사
-//        UserDao userDao = new UserDao(connectionMaker);
-
-        ConnectionMaker connectionMaker = new DConnectionMaker(); // D사
-        UserDao userDao = new UserDao(connectionMaker);
+        // UserDao 와 ConnectionMaker 생성 및 관계 설정 역할을 DaoFactory 로 분리시켰다.
+        // 그래서, UserDaoTest 역할은 기능이 잘 동작하는지 Test하는 역할 1개로  줄어들었다.
+        UserDao userDao = new DaoFactory().userDao();
 
         userDao.add(user);
         System.out.println(user.getId() + " 등록 성공");
