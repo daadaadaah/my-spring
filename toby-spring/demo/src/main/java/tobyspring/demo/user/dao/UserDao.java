@@ -4,11 +4,17 @@ import java.sql.*;
 
 import tobyspring.demo.user.domain.User;
 
-public abstract class UserDao {
+public class UserDao {
+
+    private SimpleConnectionMaker simpleConnectionMaker;
+
+    public UserDao() {
+        this.simpleConnectionMaker = new SimpleConnectionMaker();
+    }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
         // 관심 1 : DB와 연결을 위한 커넥션을 어떻게 가져올까라는 관심
-        Connection c = getConnection();
+        Connection c = simpleConnectionMaker.makeNewConnection();
 
         // 관심 2 : 사용자 등록을 위해 DB에 보낼 SQL 문장을 담을 Statement를 만들고 실행하는 관심
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
@@ -25,7 +31,7 @@ public abstract class UserDao {
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException {
-        Connection c = getConnection();
+        Connection c = simpleConnectionMaker.makeNewConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
 
@@ -48,5 +54,19 @@ public abstract class UserDao {
         return user;
     }
 
-    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        User user = new User();
+        user.setId("[D사] daadaadaah");
+        user.setName("");
+        user.setPassword("test1!");
+
+        UserDao userDao = new UserDao();
+        userDao.add(user);
+        System.out.println(user.getId() + " 등록 성공");
+
+        User user2 = userDao.get(user.getId());
+        System.out.println(user2.getName());
+        System.out.println(user2.getPassword());
+        System.out.println(user2.getId() + " 조회 성공");
+    }
 }
