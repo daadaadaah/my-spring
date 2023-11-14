@@ -6,15 +6,16 @@ import tobyspring.demo.user.domain.User;
 
 public class UserDao {
 
-    private SimpleConnectionMaker simpleConnectionMaker;
+    private ConnectionMaker connectionMaker;
 
     public UserDao() {
-        this.simpleConnectionMaker = new SimpleConnectionMaker();
+//        this.connectionMaker = new NConnectionMaker(); // N사의 경우
+        this.connectionMaker = new DConnectionMaker(); // D사의 경우
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
         // 관심 1 : DB와 연결을 위한 커넥션을 어떻게 가져올까라는 관심
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        Connection c = connectionMaker.makeConnection();
 
         // 관심 2 : 사용자 등록을 위해 DB에 보낼 SQL 문장을 담을 Statement를 만들고 실행하는 관심
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
@@ -31,7 +32,7 @@ public class UserDao {
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException {
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        Connection c = connectionMaker.makeConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
 
