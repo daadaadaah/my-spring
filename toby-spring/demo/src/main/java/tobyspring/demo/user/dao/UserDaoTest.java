@@ -10,7 +10,7 @@ public class UserDaoTest {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         User user = new User();
-        user.setId("[D사] daadaadaah");
+        user.setId("daadaadaah");
         user.setName("");
         user.setPassword("test1!");
 
