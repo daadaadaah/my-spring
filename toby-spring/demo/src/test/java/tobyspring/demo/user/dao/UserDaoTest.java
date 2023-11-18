@@ -1,29 +1,27 @@
 package tobyspring.demo.user.dao;
 
 import java.sql.SQLException;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import tobyspring.demo.user.domain.User;
 
 public class UserDaoTest {
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        User user = new User();
-        user.setId("daadaadaah");
-        user.setName("");
-        user.setPassword("test1!");
-
-        // 본격적으로 Spring 사용한다.
+    @Test
+    public void addAndGet() throws SQLException, ClassNotFoundException {
         ApplicationContext ac = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao userDao = ac.getBean("userDao", UserDao.class);
 
+        User user = new User();
+        user.setId("daadaadaa4");
+        user.setName("네네임");
+        user.setPassword("test1!");
         userDao.add(user);
-        System.out.println(user.getId() + " 등록 성공");
 
         User user2 = userDao.get(user.getId());
-        System.out.println(user2.getName());
-        System.out.println(user2.getPassword());
-        System.out.println(user2.getId() + " 조회 성공");
+        Assertions.assertEquals(user2.getName(), user.getName());
+        Assertions.assertEquals(user2.getPassword(), user.getPassword());
     }
 }
