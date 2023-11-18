@@ -66,17 +66,20 @@ public class UserDao {
 
         ResultSet rs = ps.executeQuery();
 
-        rs.next();
+        User user = null;
 
-        User user = new User();
-
-        user.setId(rs.getString("id"));
-        user.setName(rs.getString("name"));
-        user.setPassword(rs.getString("password"));
+        if (rs.next()) {
+            user = new User();
+            user.setId(rs.getString("id"));
+            user.setName(rs.getString("name"));
+            user.setPassword(rs.getString("password"));
+        }
 
         rs.close();
         ps.close();
         c.close();
+
+        if(user == null) throw new RuntimeException(); // 임시로 RuntimeException 으로 하자!
 
         return user;
     }
