@@ -13,74 +13,155 @@ public class UserDao {
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
-        // 관심 1 : DB와 연결을 위한 커넥션을 어떻게 가져올까라는 관심
-        Connection c = connectionMaker.makeConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
 
-        // 관심 2 : 사용자 등록을 위해 DB에 보낼 SQL 문장을 담을 Statement를 만들고 실행하는 관심
-        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
+        try {
+            c = connectionMaker.makeConnection();
 
-        ps.setString(1, user.getId());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getPassword());
+            ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
 
-        ps.executeUpdate();
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            throw e;
+        } finally {
+            if(ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e){
+                    /*
+                    ps.close() 메소드에도 SQLException이 발생할 수 있기 때문에 이를 잡아줘야 한다.
+                    그렇지 않으면 Connection close() 하지 못하고 메소드를 빠져나가게 된다.
+                    */
+                }
 
-        // 관심 3 : 작업이 끝나면, 사용한 리소스인 Statement와 Connection 오브젝트를 닫아줘서 소중한 공유 리소스를 시스템에 돌려주는 것
-        ps.close();
-        c.close();
+            }
+            if(c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e){ }
+            }
+        }
     }
 
     public void deleteAll() throws SQLException, ClassNotFoundException {
-        Connection c = connectionMaker.makeConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
 
-        PreparedStatement ps = c.prepareStatement("delete from users");
+        try {
+            c = connectionMaker.makeConnection();
+            ps = c.prepareStatement("delete from users");
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw e;
+        } finally {
+            if(ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e){
+                    /*
+                    ps.close() 메소드에도 SQLException이 발생할 수 있기 때문에 이를 잡아줘야 한다.
+                    그렇지 않으면 Connection close() 하지 못하고 메소드를 빠져나가게 된다.
+                    */
+                }
 
-        ps.executeUpdate();
-
-        ps.close();
-        c.close();
+            }
+            if(c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e){ }
+            }
+        }
     }
 
     public int getCount() throws SQLException, ClassNotFoundException {
-        Connection c = connectionMaker.makeConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-        PreparedStatement ps = c.prepareStatement("select count(*) from users");
+        try {
+            c = connectionMaker.makeConnection();
 
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
+            ps = c.prepareStatement("select count(*) from users");
 
-        rs.close();
-        ps.close();
-        c.close();
-
-        return count;
+            rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if(rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e){ }
+                /*
+                rs.close() 메소드에도 SQLException이 발생할 수 있기 때문에 이를 잡아줘야 한다.
+                그렇지 않으면 Connection close() 하지 못하고 메소드를 빠져나가게 된다.
+                */
+            }
+            if(ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e){ }
+            }
+            if(c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e){ }
+            }
+        }
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException {
-        Connection c = connectionMaker.makeConnection();
-
-        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
-
-        ps.setString(1, id);
-
-        ResultSet rs = ps.executeQuery();
-
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         User user = null;
 
-        if (rs.next()) {
-            user = new User();
-            user.setId(rs.getString("id"));
-            user.setName(rs.getString("name"));
-            user.setPassword(rs.getString("password"));
+        try {
+            c = connectionMaker.makeConnection();
+
+            ps = c.prepareStatement("select * from users where id = ?");
+            ps.setString(1, id);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new User();
+                user.setId(rs.getString("id"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+            }
+
+            if(user == null) throw new RuntimeException();
+
+            return user;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if(rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e){
+                    /*
+                    rs.close() 메소드에도 SQLException이 발생할 수 있기 때문에 이를 잡아줘야 한다.
+                    그렇지 않으면 Connection close() 하지 못하고 메소드를 빠져나가게 된다.
+                    */
+                }
+            }
+            if(ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e){ }
+            }
+            if(c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e){ }
+            }
         }
-
-        rs.close();
-        ps.close();
-        c.close();
-
-        if(user == null) throw new RuntimeException(); // 임시로 RuntimeException 으로 하자!
-
-        return user;
     }
 }
