@@ -11,13 +11,13 @@ package tobyspring.demo.user.dao;
     import org.junit.jupiter.api.Test;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.boot.test.context.SpringBootTest;
-    import org.springframework.context.ApplicationContext;
-    import org.springframework.context.annotation.AnnotationConfigApplicationContext;
     import org.springframework.dao.DataAccessException;
     import org.springframework.dao.DuplicateKeyException;
     import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
     import org.springframework.jdbc.support.SQLExceptionTranslator;
+    import tobyspring.demo.user.domain.Level;
     import tobyspring.demo.user.domain.User;
+
 @SpringBootTest
 public class UserDaoTest {
     @Autowired
@@ -32,9 +32,9 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setUp() {
-        this.user1 = new User("daa1", "김코딩", "secret2@");
-        this.user2 = new User("daa2", "이코딩", "springno2");
-        this.user3 = new User("daa3", "박코딩", "springno2");
+        this.user1 = new User("pilhwankim", "김필환", "secret2@", Level.BASIC, 1, 0);
+        this.user2 = new User("leegm700", "이길원", "springno1", Level.SILVER, 55, 10);
+        this.user3 = new User("bumjin", "박범진", "springno2", Level.GOLD, 100, 40);
     }
 
     @Test
@@ -48,12 +48,10 @@ public class UserDaoTest {
         assertEquals(dao.getCount(), 2);
 
         User userget1 = dao.get(user1.getId());
-        assertEquals(userget1.getName(), user1.getName());
-        assertEquals(userget1.getPassword(), user1.getPassword());
+        checkSameUser(userget1, user1);
 
         User userget2 = dao.get(user2.getId());
-        assertEquals(userget2.getName(), user2.getName());
-        assertEquals(userget2.getPassword(), user2.getPassword());
+        checkSameUser(userget2, user2);
     }
 
     @Test
@@ -103,16 +101,16 @@ public class UserDaoTest {
         dao.add(user2);
         List<User> users2 = dao.getAll();
         assertEquals(users2.size(), 2);
-        checkSameUser(user1, users2.get(0));
-        checkSameUser(user2, users2.get(1));
+        checkSameUser(user1, users2.get(1));
+        checkSameUser(user2, users2.get(0));
 
 
         dao.add(user3);
         List<User> users3 = dao.getAll();
         assertEquals(users3.size(), 3);
-        checkSameUser(user1, users3.get(0));
+        checkSameUser(user1, users3.get(2));
         checkSameUser(user2, users3.get(1));
-        checkSameUser(user3, users3.get(2));
+        checkSameUser(user3, users3.get(0));
     }
 
     @Test
@@ -133,5 +131,8 @@ public class UserDaoTest {
         assertEquals(user1.getId(), user2.getId());
         assertEquals(user1.getName(), user2.getName());
         assertEquals(user1.getPassword(), user2.getPassword());
+        assertEquals(user1.getLevel(), user2.getLevel());
+        assertEquals(user1.getLogin(), user2.getLogin());
+        assertEquals(user1.getRecommend(), user2.getRecommend());
     }
 }
