@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import tobyspring.demo.user.domain.Level;
 import tobyspring.demo.user.domain.User;
 
 public class UserDaoJdbc implements UserDao {
@@ -30,13 +32,19 @@ public class UserDaoJdbc implements UserDao {
             user.setId(rs.getString("id"));
             user.setName(rs.getString("name"));
             user.setPassword(rs.getString("password"));
+            user.setLevel(Level.valueOf(rs.getInt("level")));
+            user.setLogin(rs.getInt("login"));
+            user.setRecommend(rs.getInt("recommend"));
+            user.setEmail(rs.getString("email"));
             return user;
         }
     };
 
     public void add(final User user) {
-        this.jdbcTemplate.update("insert into users(id, name, password) values(?, ?, ?)",
-            user.getId(), user.getName(), user.getPassword());
+        this.jdbcTemplate.update(
+                "insert into users(id, name, password, level, login, recommend, email) " +
+                        "values(?, ?, ?, ?, ?, ?, ?)", user.getId(), user.getName(),
+                user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getEmail());
     }
 
     public List<User> getAll() {
@@ -58,5 +66,13 @@ public class UserDaoJdbc implements UserDao {
 
     public int getCount() {
         return this.jdbcTemplate.queryForObject("select count(*) from users", Integer.class);
+    }
+
+    @Override
+    public void update(User user) {
+        this.jdbcTemplate.update(
+                "update users set name = ?, password = ?, level = ?, login = ?," +
+                        "email = ?, recommend = ? where id = ? ", user.getName(), user.getPassword(),
+                user.getLevel().intValue(), user.getLogin(), user.getEmail(), user.getRecommend(), user.getId());
     }
 }

@@ -21,6 +21,9 @@ dependencies {
 
 	// jdbc
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// 이메일
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
