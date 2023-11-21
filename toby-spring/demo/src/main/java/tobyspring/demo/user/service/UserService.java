@@ -1,7 +1,7 @@
 package tobyspring.demo.user.service;
 
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -20,9 +20,12 @@ public class UserService {
 
     private PlatformTransactionManager transactionManager;
 
-    public UserService(UserDao userDao, PlatformTransactionManager transactionManager) {
+    private MailSender mailSender;
+
+    public UserService(UserDao userDao, PlatformTransactionManager transactionManager, MailSender mailSender) {
         this.userDao = userDao;
         this.transactionManager = transactionManager;
+        this.mailSender = mailSender;
     }
 
     public UserService() {
@@ -34,6 +37,10 @@ public class UserService {
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     public void upgradeLevels() {
@@ -71,16 +78,13 @@ public class UserService {
     }
 
     private void sendUpgradeEMail(User user) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl(); // JavaMailSender 구현 클래스의 오브젝트를 생성한다.
-        mailSender.setHost("mail.server.com");
-
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setFrom("useradmin@ksug.org");
         mailMessage.setSubject("Upgrade 안내");
         mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
 
-        mailSender.send(mailMessage);
+        this.mailSender.send(mailMessage);
     }
 
     public void add(User user) {

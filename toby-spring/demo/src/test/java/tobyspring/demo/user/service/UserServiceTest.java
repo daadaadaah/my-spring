@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
 import tobyspring.demo.user.dao.UserDao;
 import tobyspring.demo.user.domain.Level;
@@ -28,6 +29,9 @@ public class UserServiceTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
+    @Autowired
+    MailSender mailSender;
+
     List<User> users;
 
     @BeforeEach
@@ -47,12 +51,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels() {
+    public void upgradeLevels() throws Exception {
         this.userDao.deleteAll();
 
         for(User user: users) userDao.add(user);
 
-        try {
+//        try {
             userService.upgradeLevels();
 
             checkLevelUpgraded(users.get(0), false);
@@ -60,9 +64,9 @@ public class UserServiceTest {
             checkLevelUpgraded(users.get(2), false);
             checkLevelUpgraded(users.get(3), true);
             checkLevelUpgraded(users.get(4), false);
-        } catch (Exception e) {
-
-        }
+//        } catch (Exception e) {
+//
+//        }
     }
 
     @Test
@@ -88,6 +92,7 @@ public class UserServiceTest {
         UserService testUserService = new TestUserService(users.get(3).getId()); // 예외를 발생시킬 네 번째 사용자의 id를 넣어서 생성한다.
         testUserService.setUserDao(this.userDao); // userDao 수동 DI
         testUserService.setTransactionManager(this.transactionManager);
+        testUserService.setMailSender(this.mailSender);
 
         userDao.deleteAll();
         for(User user : users) {
