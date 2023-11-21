@@ -4,12 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import tobyspring.demo.user.dao.UserDao;
 import tobyspring.demo.user.domain.Level;
 import tobyspring.demo.user.domain.User;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,22 +55,26 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels() throws Exception {
+    public void upgradeLevels() {
         this.userDao.deleteAll();
 
         for(User user: users) userDao.add(user);
 
-//        try {
-            userService.upgradeLevels();
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
 
-            checkLevelUpgraded(users.get(0), false);
-            checkLevelUpgraded(users.get(1), true);
-            checkLevelUpgraded(users.get(2), false);
-            checkLevelUpgraded(users.get(3), true);
-            checkLevelUpgraded(users.get(4), false);
-//        } catch (Exception e) {
-//
-//        }
+        userService.upgradeLevels();
+
+        checkLevelUpgraded(users.get(0), false);
+        checkLevelUpgraded(users.get(1), true);
+        checkLevelUpgraded(users.get(2), false);
+        checkLevelUpgraded(users.get(3), true);
+        checkLevelUpgraded(users.get(4), false);
+
+        List<String> request = mockMailSender.getRequests();
+        assertEquals(request.size(), 2);
+        assertEquals(request.get(0), users.get(1).getEmail());
+        assertEquals(request.get(1), users.get(3).getEmail());
     }
 
     @Test
@@ -137,6 +145,24 @@ public class UserServiceTest {
 
         static class TestUserServiceException extends RuntimeException {
 
+        }
+    }
+
+    static class MockMailSender implements MailSender {
+
+        private List<String> requests = new ArrayList<>();
+
+        public List<String> getRequests() {
+            return requests;
+        }
+
+        @Override
+        public void send(SimpleMailMessage... mailMessage) throws MailException {
+        }
+
+        @Override
+        public void send(SimpleMailMessage simpleMessage) throws MailException {
+            requests.add(simpleMessage.getTo()[0]); // 전송 요청을 받은 이메일 주소를 저장해둔다. 첫번쨰 수신자 메일이다
         }
     }
 }
