@@ -1,14 +1,12 @@
 package tobyspring.demo.user.service;
 
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import tobyspring.demo.user.dao.UserDao;
 import tobyspring.demo.user.domain.Level;
 import tobyspring.demo.user.domain.User;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserService {
@@ -18,11 +16,11 @@ public class UserService {
 
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
 
-    public UserService(UserDao userDao, DataSource dataSource) {
+    public UserService(UserDao userDao, PlatformTransactionManager transactionManager) {
         this.userDao = userDao;
-        this.dataSource = dataSource;
+        this.transactionManager = transactionManager;
     }
 
     public UserService() {
@@ -32,14 +30,12 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void setDataSource(DataSource dataSource) { // Connection을 생성할 때 사용할 DataSource를 DI
-        this.dataSource = dataSource;
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
-    public void upgradeLevels() throws SQLException {
-        TransactionSynchronizationManager.initSynchronization(); // 트랜잭션 동기화 관리자를 이용해 동기화 작업을 초기화
-        Connection c = DataSourceUtils.getConnection(dataSource); // DB 커넥션 생성과 동기화를 함께 해주는 유틸리티 메소드
-        c.setAutoCommit(false);
+    public void upgradeLevels() {
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         try {
             List<User> users = userDao.getAll();
@@ -48,14 +44,10 @@ public class UserService {
                     upgradeLevel(user);
                 }
             }
-            c.commit(); // 정상적으로 작업을 마치면 트랜잭션 커밋
-        } catch (Exception e) {
-            c.rollback(); // 예외가 발생할 경우 롤백
+            transactionManager.commit(status); // 정상적으로 작업을 마치면 트랜잭션 커밋
+        } catch (RuntimeException e) {
+            transactionManager.rollback(status);; // 예외가 발생할 경우 롤백
             throw e;
-        } finally {
-            DataSourceUtils.releaseConnection(c, dataSource); // 스프링 유틸리티 메소드를 이용해 DB 커넥션을 안전하게 닫는다
-            TransactionSynchronizationManager.unbindResource(this.dataSource); // 동기화 작업 종료 및 정리
-            TransactionSynchronizationManager.clearSynchronization();
         }
     }
 
