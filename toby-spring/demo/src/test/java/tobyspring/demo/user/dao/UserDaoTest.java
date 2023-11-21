@@ -32,9 +32,9 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setUp() {
-        this.user1 = new User("pilhwankim", "김필환", "secret2@", Level.BASIC, 1, 0);
-        this.user2 = new User("leegm700", "이길원", "springno1", Level.SILVER, 55, 10);
-        this.user3 = new User("bumjin", "박범진", "springno2", Level.GOLD, 100, 40);
+        this.user1 = new User("pilhwankim", "김필환", "secret2@", Level.BASIC, 1, 0, "pilhwankim@gmail.com");
+        this.user2 = new User("leegm700", "이길원", "springno1", Level.SILVER, 55, 10, "leegm700@gmail.com");
+        this.user3 = new User("bumjin", "박범진", "springno2", Level.GOLD, 100, 40, "bumjin@gmail.com");
     }
 
     @Test
