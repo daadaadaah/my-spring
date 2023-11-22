@@ -9,6 +9,8 @@ import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
 import tobyspring.demo.mail.DummyMailSender;
 import tobyspring.demo.user.service.UserService;
+import tobyspring.demo.user.service.UserServiceImpl;
+import tobyspring.demo.user.service.UserServiceTx;
 
 @Configuration
 public class DaoFactory {
@@ -22,8 +24,14 @@ public class DaoFactory {
 
     @Bean
     public UserService userService() {
-        UserService userService = new UserService(userDao(), platformTransactionManager(), mailSender());
+        UserService userService = new UserServiceTx(userServiceImpl(), platformTransactionManager());
         return userService;
+    }
+
+    @Bean
+    public UserServiceImpl userServiceImpl() {
+        UserServiceImpl userServiceImpl = new UserServiceImpl(userDao(), mailSender());
+        return userServiceImpl;
     }
 
     @Bean
