@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import tobyspring.demo.user.dao.UserDao;
 import tobyspring.demo.user.domain.Level;
@@ -18,14 +17,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static tobyspring.demo.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static tobyspring.demo.user.service.UserService.MIN_RECCOMEND_FOR_GOLD;
+import static tobyspring.demo.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static tobyspring.demo.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
 @SpringBootTest
 public class UserServiceTest {
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userServiceImpl;
 
     @Autowired
     UserDao userDao;
@@ -51,7 +50,7 @@ public class UserServiceTest {
 
     @Test
     public void bean() {
-        assertNotNull(this.userService);
+        assertNotNull(this.userServiceImpl);
     }
 
     @Test
@@ -61,9 +60,9 @@ public class UserServiceTest {
         for(User user: users) userDao.add(user);
 
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
-        userService.upgradeLevels();
+        userServiceImpl.upgradeLevels();
 
         checkLevelUpgraded(users.get(0), false);
         checkLevelUpgraded(users.get(1), true);
@@ -85,8 +84,8 @@ public class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        userService.add(userWithLevel);
-        userService.add(userWithoutLevel);
+        userServiceImpl.add(userWithLevel);
+        userServiceImpl.add(userWithoutLevel);
 
         User userWithLevelRead = userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -97,10 +96,13 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-        UserService testUserService = new TestUserService(users.get(3).getId()); // 예외를 발생시킬 네 번째 사용자의 id를 넣어서 생성한다.
+        TestUserService testUserService = new TestUserService(users.get(3).getId()); // 예외를 발생시킬 네 번째 사용자의 id를 넣어서 생성한다.
         testUserService.setUserDao(this.userDao); // userDao 수동 DI
-        testUserService.setTransactionManager(this.transactionManager);
         testUserService.setMailSender(this.mailSender);
+
+        UserServiceTx txUserService = new UserServiceTx();
+        txUserService.setPlatformTransactionManager(this.transactionManager);
+        txUserService.setUserService(testUserService);
 
         userDao.deleteAll();
         for(User user : users) {
@@ -109,7 +111,7 @@ public class UserServiceTest {
 
         try {
             // testUserService 는 업그레이드 작업 중에 예외가 발생해야 한다. 정상 종료라면 문제가 있으니 실패
-            testUserService.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("TestUserServiceException excepted"); // 테스트가 의도한 대로 동작하는지를 확인하기 위해 넣은 것
         } catch(Exception e) { // TestUserService가 던져주는 예외를 잡아서 계속 진행되도록 한다. 그 외의 예외라면 테스트 실패
 
@@ -129,7 +131,7 @@ public class UserServiceTest {
     }
 
     // 테스트용으로 특별히 만든 UserService의 대역
-    static class TestUserService extends UserService {
+    static class TestUserService extends UserServiceImpl {
         private String id;
 
         private TestUserService(String id) {
