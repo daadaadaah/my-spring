@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static tobyspring.demo.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static tobyspring.demo.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
@@ -59,21 +60,30 @@ public class UserServiceTest {
 
         for(User user: users) userDao.add(user);
 
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
+
+        MockUserDao mockUserDao = new MockUserDao(this.users);
+        userServiceImpl.setUserDao(mockUserDao);
+
         MockMailSender mockMailSender = new MockMailSender();
         userServiceImpl.setMailSender(mockMailSender);
 
         userServiceImpl.upgradeLevels();
 
-        checkLevelUpgraded(users.get(0), false);
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(2), false);
-        checkLevelUpgraded(users.get(3), true);
-        checkLevelUpgraded(users.get(4), false);
+        List<User> updated = mockUserDao.getUpdated();
+        assertEquals(updated.size(), 2);
+        checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
+        checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
 
         List<String> request = mockMailSender.getRequests();
         assertEquals(request.size(), 2);
         assertEquals(request.get(0), users.get(1).getEmail());
         assertEquals(request.get(1), users.get(3).getEmail());
+    }
+
+    private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+        assertEquals(updated.getId(), expectedId);
+        assertEquals(updated.getLevel(), expectedLevel);
     }
 
     @Test
@@ -166,5 +176,33 @@ public class UserServiceTest {
         public void send(SimpleMailMessage simpleMessage) throws MailException {
             requests.add(simpleMessage.getTo()[0]); // 전송 요청을 받은 이메일 주소를 저장해둔다. 첫번쨰 수신자 메일이다
         }
+    }
+
+    static class MockUserDao implements UserDao {
+        private List<User> users;
+        private List<User> updated = new ArrayList();
+
+        private MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+
+        public List<User> getUpdated() {
+            return this.updated;
+        }
+
+        public List<User> getAll() { // 스텁 기능 제공
+            return this.users;
+        }
+
+        public void update(User user) {
+            updated.add(user); // 목 오브젝트 기능 제공
+        }
+
+        // 테스트에서 사용되지 않는 메서드들
+        public void add(User user) { throw new UnsupportedOperationException(); }
+        public void deleteAll() { throw new UnsupportedOperationException(); }
+        public User get(String id) { throw new UnsupportedOperationException(); }
+        public int getCount() { throw new UnsupportedOperationException(); }
     }
 }
